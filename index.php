@@ -12,9 +12,9 @@ create unique index `sorttable_column_uindex` on `sorttable` (`hash`);
 
 // Параметры для подключения
 $db_host = "localhost"; 
-$db_user = "grom"; // Логин БД
-$db_password = "3101"; // Пароль БД
-$db_base = "gromtestbase"; // Имя БД
+$db_user = "user_login"; // Логин БД
+$db_password = "password"; // Пароль БД
+$db_base = "db_name"; // Имя БД
 $db_table = "sorttable"; // Имя Таблицы БД
 
 // Подключение к базе данных
