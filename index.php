@@ -1,62 +1,21 @@
-<html>
-<head>
-	<meta content="text/html; charset=utf-8">
-	<title>Запись в БД через форму на php</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-<style type="text/css">
-body {
-	font-family: "Open Sans";
-	margin: auto;
-}
-header {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-}
-table tbody tr:first-child {
-	text-transform: uppercase;
-}
-table tbody tr td {word-break: break-word;min-width: 35px;}
-
-table tbody tr:nth-child(2n) {background: #ccc;}
-
-.result {
-	display: flex;
-	justify-content: center;
-    width: 70%;
-    margin: auto;
-}
-.addform {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-}
-</style>
-</head>
-<header>
-	<a href="./">индекс /</a>
-</header>
-<body>
 <?php
 /* создаем БД
-CREATE TABLE `matrixtable` (
-  `id` int(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `content` text NOT NULL,
-)
+CREATE TABLE `gromtestbase`.`sorttable` ( `id` INT NOT NULL AUTO_INCREMENT , `content` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
-для уникальности: alter table matrixtable add hash binary(16) null;
+для уникальности:
+alter table sorttable add hash binary(16) null;
 
-update `matrixtable` set `hash`=unhex(md5(`content`))
+update `sorttable` set `hash`=unhex(md5(`content`));
 
-create unique index `matrixtable_column_uindex` on `matrixtable` (`hash`);
+create unique index `sorttable_column_uindex` on `sorttable` (`hash`);
 */
 
 // Параметры для подключения
 $db_host = "localhost"; 
-$db_user = "test"; // Логин БД
-$db_password = "1111"; // Пароль БД
-$db_base = "testbase"; // Имя БД
-$db_table = "matrixtable"; // Имя Таблицы БД
+$db_user = "grom"; // Логин БД
+$db_password = "3101"; // Пароль БД
+$db_base = "gromtestbase"; // Имя БД
+$db_table = "sorttable"; // Имя Таблицы БД
 
 // Подключение к базе данных
 $mysqli = new mysqli($db_host,$db_user,$db_password,$db_base);
@@ -105,13 +64,13 @@ $text = $_POST['content'];
 // Запись в БД
 if ( isset($_POST['content'])){
 
-    $resultsql = $mysqli->query("INSERT INTO ".$db_table." (content) VALUES ('$text')");
+    $resultsql = $mysqli->query("INSERT INTO `$db_table` (`content`) VALUES ('$text')");
 
     // Вывод отчета
     if ($resultsql == true){
-    	echo "Информация занесена в базу данных";
+        echo "Информация занесена в базу данных";
     }else{
-    	echo "Информация <b>не</b> занесена в базу данных";
+        echo "Информация <b>не</b> занесена в базу данных";
     }
 }
 
@@ -119,7 +78,7 @@ if ( isset($_POST['content'])){
 echo $resultsql;
 
 // проверка на совпадение в бд
-$stmt = $mysqli->prepare("INSERT ".$db_table." (`content`, `hash`) VALUES (?, unhex(md5(?)))");
+$stmt = $mysqli->prepare("INSERT `$db_table` (`content`, `hash`) VALUES (?, unhex(md5(?)))");
 $stmt->bind_param("ss", $result, $result);
 if($stmt->execute()) {
     echo 'проверка прошла</br>';
@@ -140,21 +99,73 @@ $deleteId = $_POST['del-id'];
 
 if (isset($_POST['del-id'])){
 
-    $resultsql = $mysqli->query("DELETE FROM `matrixtable` WHERE `matrixtable`.`id` = ('$deleteId')");
+    $resultsql = $mysqli->query("DELETE FROM `$db_table` WHERE `$db_table`.`id` = ('$deleteId')");
 
     // Вывод отчета
     if ($resultsql == true){
-    	echo "Информация удалена из базы данных";
+        echo "Информация удалена из базы данных";
     }else{
-    	echo "Информация не удалена из базы данных";
+        echo "Информация не удалена из базы данных";
     }
 }
 
 ?>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8">
+    <title>Запись в БД через форму на php</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<style type="text/css">
+body {
+    font-family: "Open Sans";
+    margin: auto;
+}
+header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+table tbody tr:first-child {
+    text-transform: uppercase;
+}
+table tbody tr td {word-break: break-word;min-width: 35px;}
+
+table tbody tr:nth-child(2n) {background: #ccc;}
+
+.result {
+    display: flex;
+    justify-content: center;
+    width: 70%;
+    margin: auto;
+}
+.actionform {
+    display: block;
+    position: fixed;
+    top: 20px;
+    right: 10px;
+    width: 170px;
+    border: 1px solid #eee;
+    background: #01dbff;
+}
+.addform {
+    width: 100%;
+    margin: auto;
+}
+.delform {
+    width: 100%;
+    margin: auto;
+}
+</style>
+</head>
+<header>
+    <a href="./">индекс /</a>
+    <a href="../">/ вверх</a>
+</header>
+<body>
 <div class="show"><?php echo $result; ?></div>
 <div class="result">
 <?php
-$query ="SELECT * FROM matrixtable ORDER BY id DESC";
+$query ="SELECT * FROM `$db_table` ORDER BY `id` DESC";
 
 $resultsql = mysqli_query($mysqli, $query) or die("Ошибка " . mysqli_error($mysqli)); 
 if($resultsql)
@@ -179,19 +190,21 @@ if($resultsql)
 <?php
 mysqli_close($mysqli);
 ?>
-<div class="addform">
-	<form method="POST" action="">
-		<input name="content" type="text" placeholder="Имя"/><br />
-		<div class="" name=""></div>
-		<input type="submit" value="Записать"/>
-		<hr>
-	</form>
-</div>
-<div class="addform">
-	<form method="POST" action="">
-		<input name="del-id" type="number" placeholder="Введите ID"/>
-		<input type="submit" value="Удалить"/>
-	</form>
-</div>
+<section class="actionform">
+    <div class="addform">
+        <form method="POST" action="">
+            <input name="content" type="text" placeholder="Имя"/><br />
+            <div class="" name=""></div>
+            <input type="submit" value="Записать"/>
+            <hr>
+        </form>
+    </div>
+    <div class="delform">
+        <form method="POST" action="">
+            <input name="del-id" type="number" placeholder="Введите ID"/>
+            <input type="submit" value="Удалить"/>
+        </form>
+    </div>
+</section>
 </body>
 </html>
